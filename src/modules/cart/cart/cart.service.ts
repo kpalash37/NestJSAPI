@@ -73,30 +73,36 @@ export class CartService {
 
 
 
-  async addProductToCartAsync(cartId: string, productId: string, quantity: number, price: number): Promise<Cart> {
-    try {
+  async addProductToCartAsync(cartId: string, productId: string, quantity: number): Promise<Cart> {
+   
       const cart = await this.cartModel.findById(cartId);
-      let stockQuantity : number = quantity;
+      const stockQuantity : number = quantity;
       if (!cart) throw new NotFoundException('Cart not found');
 
-      const existingItem = cart.items.find(item => item.product?.toString() === productId);
       
-      if (existingItem) {
-       stockQuantity = existingItem.quantity - quantity;
-        existingItem.quantity += quantity;
-      } else {
-        cart.items.push({ product: new Types.ObjectId(productId), quantity });
-      }
+      const product =await this.getProductByIdAsync(productId);
+      if (product.stock < quantity)
+        throw new BadRequestException(`Product stock is less than the quantity you are trying to add`);
 
-      cart.totalPrice += price * quantity;
-      await cart.save();
 
-      // Emit event to decrease stock
-      const operation = stockQuantity > 0 ? 'decrease' : 'increase';
-      // eslint-disable-next-line @typescript-eslint/await-thenable      
-      await this.eventEmitter.emit(CART_EVENTS.PRODUCT_ADDED, new ProductStockUpdateEventDto(productId, Math.abs(stockQuantity), operation));
+      try {
+        const existingItem = cart.items.find(item => item.product?.toString() === productId);        
 
-      return cart;
+        if (existingItem) {
+          existingItem.quantity += quantity;
+        } else {
+          cart.items.push({ product: new Types.ObjectId(productId), quantity });
+        }
+
+        cart.totalPrice += product.price * quantity;
+        await cart.save();
+
+        // Emit event to decrease stock
+        const operation = 'decrease';
+        // eslint-disable-next-line @typescript-eslint/await-thenable      
+        await this.eventEmitter.emit(CART_EVENTS.PRODUCT_ADDED, new ProductStockUpdateEventDto(productId, Math.abs(stockQuantity), operation));
+
+        return cart;
     } catch (error: any) {
       console.error('Error adding product to cart:', error);
       throw new InternalServerErrorException('Error adding product to cart');
@@ -128,10 +134,16 @@ export class CartService {
 
     const item = cart.items.find(item => item.product.toString() === productId);
     if (!item) throw new NotFoundException('Product not found in cart');
+ 
 
     const quantityDifference = newQuantity - item.quantity;
     item.quantity = newQuantity;
-    cart.totalPrice += quantityDifference * 10; // Example price handling
+
+    const product = await this.getProductByIdAsync(productId);
+    if (product.stock < quantityDifference)
+      throw new BadRequestException(`Product stock is less than the quantity you are trying to add`);
+
+    cart.totalPrice += quantityDifference * product.price; 
 
     await cart.save();
 
@@ -152,5 +164,17 @@ export class CartService {
       console.error('Error deleting cart:', error);
       throw new InternalServerErrorException('Error deleting cart');
     }
+  }
+
+  private async getProductByIdAsync(productId: string): Promise<any> {
+    const productArray: any = await this.eventEmitter.emitAsync(CART_EVENTS.PRODUCT_GET, productId);
+    const product = productArray.find(x => x._id == productId);
+    console.log("product::", product);
+
+    if (!product) {
+      throw new NotFoundException(`Product not found, please try with another product`);
+    }
+
+    return product;
   }
 }

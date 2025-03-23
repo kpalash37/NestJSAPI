@@ -4,10 +4,6 @@ import { Model } from 'mongoose';
 import { Product, ProductDocument } from '../../schemas/product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { OnEvent } from '@nestjs/event-emitter';
-import { CART_EVENTS } from 'src/common/events/cart-events';
-import { ProductStockUpdateEventDto } from '../cart/cart/dtos/cart-event.dto';
-
 @Injectable()
 export class ProductService {
   constructor(@InjectModel(Product.name) private productModel: Model<ProductDocument>) {}
@@ -67,24 +63,6 @@ export class ProductService {
         throw new NotFoundException('Product not found')
     }
     return deletedProduct;
-  }
-
-  @OnEvent(CART_EVENTS.PRODUCT_ADDED)
-  @OnEvent(CART_EVENTS.PRODUCT_REMOVED)
-  @OnEvent(CART_EVENTS.QUANTITY_UPDATED)
-
-  async handleStockUpdateAsync(event: ProductStockUpdateEventDto) {
-    const product = await this.productModel.findById(event.productId);
-    if (!product) return;
-
-    if (event.operation === 'decrease' && product.stock >= event.quantity) {
-      product.stock -= event.quantity;
-    } else if (event.operation === 'increase') {
-      product.stock += event.quantity;
-    }
-
-    await product.save();
-    Logger.log(`Stock updated for product ${product.id}: ${product.stock}`);
   } 
   
 }

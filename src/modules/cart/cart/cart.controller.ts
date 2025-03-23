@@ -58,8 +58,7 @@ export class CartController {
     return this.cartService.addProductToCartAsync(
       cartId,
       addProductDto.productId,
-      addProductDto.quantity,
-      10, // Example price
+      addProductDto.quantity
     );
   }
 
