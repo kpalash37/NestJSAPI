@@ -33,7 +33,7 @@ export class ProductService {
   }
 
   async updateAsync(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
-    const updatedProduct = await this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true }).exec();
+    const updatedProduct = await this.productModel.findByIdAndUpdate(id, updateProductDto, { new: true, runValidators: true  }).exec();
     if (!updatedProduct) {
         throw new NotFoundException('Product not found')
     }
