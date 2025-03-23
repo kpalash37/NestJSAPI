@@ -12,7 +12,7 @@ export class Product {
   @Prop({ maxlength: 2048 })
   description?: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   image: string; // Base64 or URL
 
   @Prop({ required: true, type: Number, min: 0 })

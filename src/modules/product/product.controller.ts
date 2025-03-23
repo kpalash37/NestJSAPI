@@ -3,6 +3,7 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UpdateStockDto } from './dto/update-stock.dto';
 
 @ApiTags('Products')
 @Controller('products')
@@ -41,7 +42,10 @@ export class ProductController {
 
   @Patch(':id/update-stock')
   @ApiResponse({ status: 200, description: 'Stock updated successfully.' })
-  async updateStock(@Param('id') id: string, @Body() body: { quantity: number }) {
-    return await this.productService.updateStockAsync(id, body.quantity );
+  async updateStock(
+    @Param('id') id: string, 
+    @Body() body: UpdateStockDto
+  ) {
+    return await this.productService.updateStockAsync(id, body.quantity);
   }
 }
