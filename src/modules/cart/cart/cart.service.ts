@@ -155,11 +155,17 @@ export class CartService {
   }
 
   async deleteCartAsync(cartId: string): Promise<void> {
-    try {
+   
       const cart = await this.cartModel.findById(cartId);
       if (!cart) throw new NotFoundException('Cart not found');
 
-      await this.cartModel.deleteOne({ _id: cartId });
+      try {
+
+        for (const item of cart.items) {
+          this.eventEmitter.emit(CART_EVENTS.PRODUCT_REMOVED, new ProductStockUpdateEventDto(item.product.toString(), item.quantity, 'increase'));
+        }
+
+        await this.cartModel.deleteOne({ _id: cartId });
     } catch (error: any) {
       console.error('Error deleting cart:', error);
       throw new InternalServerErrorException('Error deleting cart');
