@@ -5,6 +5,7 @@ import { AppService } from "./app.service";
 import { MongooseModule } from "@nestjs/mongoose";
 import { EventEmitterModule } from "@nestjs/event-emitter";
 import { ConfigModule } from "@nestjs/config";
+import { CartModule } from "./modules/cart/cart/cart.module";
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ConfigModule } from "@nestjs/config";
 
     EventEmitterModule.forRoot(),
      ProductModule,
+     CartModule
   ],
   controllers: [AppController],
   providers: [AppService],
