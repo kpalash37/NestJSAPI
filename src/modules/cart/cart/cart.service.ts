@@ -20,23 +20,69 @@ export class CartService {
   
   async createCartAsync(userId: string): Promise<Cart> {
     try {
-      const cart = new this.cartModel({ userId, items: [], totalPrice: 0 });
-      return await cart.save();
+      let cart = await this.cartModel.findOne({ userId });
+
+      if (!cart) {
+      cart = new this.cartModel({ userId, items: [], totalPrice: 0 });
+      await cart.save();
+      }
+
+      return cart;
     } catch (error: any) {
       console.log('error', error);
-      throw new InternalServerErrorException('Error creating cart');
+      throw new InternalServerErrorException('Error retrieving or creating cart');
     }
   }
+
+  async getCartByUserIdAsync(userId: string): Promise<Cart> {
+    try {
+      const cart = await this.cartModel.findOne({ userId });
+      if (!cart) throw new NotFoundException('Cart not found');
+
+      return cart;
+    }
+    catch (error: any) {
+      console.error('Error getting cart:', error);
+      throw new InternalServerErrorException('Error getting cart details');
+    }
+  }
+
+  async getCartByIdAsync(cartId: string): Promise<Cart> {
+    try {
+      const cart = await this.cartModel.findById(cartId);
+      if (!cart) throw new NotFoundException('Cart not found');
+
+      return cart;
+    }
+    catch (error: any) {
+      console.error('Error getting cart:', error);
+      throw new InternalServerErrorException('Error getting cart details');
+    }
+  }
+
+  async getAllCartsAsync(): Promise<Cart[]> {
+    try {
+      const carts = await this.cartModel.find().lean().exec();
+      return carts;
+    }
+    catch (error: any) {
+      console.error('Error getting all carts:', error);
+      throw new InternalServerErrorException('Error getting cart details');
+    }
+  }
+
 
 
   async addProductToCartAsync(cartId: string, productId: string, quantity: number, price: number): Promise<Cart> {
     try {
       const cart = await this.cartModel.findById(cartId);
+      let stockQuantity : number = quantity;
       if (!cart) throw new NotFoundException('Cart not found');
 
       const existingItem = cart.items.find(item => item.product?.toString() === productId);
       
       if (existingItem) {
+       stockQuantity = existingItem.quantity - quantity;
         existingItem.quantity += quantity;
       } else {
         cart.items.push({ product: new Types.ObjectId(productId), quantity });
@@ -46,7 +92,9 @@ export class CartService {
       await cart.save();
 
       // Emit event to decrease stock
-      this.eventEmitter.emit(CART_EVENTS.PRODUCT_ADDED, new ProductStockUpdateEventDto(productId, quantity, 'decrease'));
+      const operation = stockQuantity > 0 ? 'decrease' : 'increase';
+      // eslint-disable-next-line @typescript-eslint/await-thenable      
+      await this.eventEmitter.emit(CART_EVENTS.PRODUCT_ADDED, new ProductStockUpdateEventDto(productId, Math.abs(stockQuantity), operation));
 
       return cart;
     } catch (error: any) {

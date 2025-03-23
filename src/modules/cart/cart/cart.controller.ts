@@ -1,28 +1,55 @@
-import {Controller, Post, Param, Body, Delete, Patch, HttpCode, HttpStatus} from "@nestjs/common";
+import {
+  Controller,
+  Post,
+  Param,
+  Body,
+  Delete,
+  Patch,
+  HttpCode,
+  HttpStatus,
+  Get,
+} from "@nestjs/common";
 import { CartService } from "./cart.service";
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags} from "@nestjs/swagger";
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 import { AddProductToCartDto, UpdateProductQuantityDto } from "./dtos/cart.dto";
 
-@ApiTags("Cart") 
+@ApiTags("Cart")
 @Controller("cart")
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @ApiOperation({ summary: "Create a shopping cart for a user" })
-  @ApiParam({ name: "userId", required: true, description: "User ID" })
   @ApiResponse({ status: 201, description: "Cart created successfully" })
   @Post("/:userId")
   async createCart(@Param("userId") userId: string) {
     return this.cartService.createCartAsync(userId);
   }
 
+  @Get()
+  @ApiOperation({ summary: "Get all cart details" })
+  @ApiResponse({ status: 200, description: "Retrieve all carts details." })
+  async getAllCarts() {
+    return await this.cartService.getAllCartsAsync();
+  }
+
+  @Get("/:userId")
+  @ApiOperation({ summary: "Get cart details by userId" })
+  @ApiResponse({ status: 200, description: "Retrieve cart details." })
+  async getByUserId(@Param("userId") userId: string) {
+    return await this.cartService.getCartByUserIdAsync(userId);
+  }
+
+  
+
   @ApiOperation({ summary: "Add a product to the cart" })
-  @ApiParam({ name: "cartId", required: true, description: "Cart ID" })
   @ApiBody({ type: AddProductToCartDto })
-  @ApiResponse({
-    status: 200,
-    description: "Product added to cart successfully",
-  })
+  @ApiResponse({ status: 200, description: "Product added to cart successfully"})
   @Post("/:cartId/add-product")
   async addProduct(
     @Param("cartId") cartId: string,
@@ -64,6 +91,7 @@ export class CartController {
   })
   @Delete("/:cartId/remove-product/:productId")
   @HttpCode(HttpStatus.NO_CONTENT)
+
   async removeProduct(
     @Param("cartId") cartId: string,
     @Param("productId") productId: string,
@@ -76,6 +104,7 @@ export class CartController {
   @ApiResponse({ status: 204, description: "Cart deleted successfully" })
   @Delete("/:cartId")
   @HttpCode(HttpStatus.NO_CONTENT)
+
   async deleteCart(@Param("cartId") cartId: string) {
     await this.cartService.deleteCartAsync(cartId);
   }
