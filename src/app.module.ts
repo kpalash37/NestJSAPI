@@ -13,7 +13,7 @@ import { CartModule } from "./modules/cart/cart/cart.module";
 
     MongooseModule.forRootAsync({
       useFactory: () => {
-        const mongoUri = process.env.MONGO_CONNECTION;
+        const mongoUri = process.env.MONGO_URI;
 
         if (!mongoUri) {
           throw new Error(`MONGO_CONNECTION environment variable is not defined.Con: ${process.env.MONGO_CONNECTION}` );
