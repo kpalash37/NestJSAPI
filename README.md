@@ -1,98 +1,161 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# Test Task for Backend Developer: Node.js Application Using NestJS Framework
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Task Overview
+This test task involves creating a Node.js application using the NestJS framework, focusing on the development of a multiple-module application with simple shop and shopping cart functionalities. The task is divided into three main parts:
+- **Database Design**
+- **Coding**
+- **Tests for NestJS** (Optional but nice to have)
 
-## Description
+## What I Have Done
+The following deliverables are completed as part of the task:
+1. **Database Schema Design**: I have used a MongoDB database as mentioned in the job description.
+2. **Node.js Application Code**: Implemented using the NestJS framework.
+3. **Swagger Documentation**: API documentation using Swagger for the backend services.
+4. **Dockerfile**: For building the NestJS app container.
+5. **docker-compose.yaml**: For starting additional services and the backend app.
+6. **Service To Service Communication**: I have used pub/sub for communication between services.
+7. **Product and Cart Module**: Created two modules with zero cohesion between them.
+8. **Git Repository**: With proper Gitflow and conventional commit messages.
+9. **Testing (Optional)**: While testing was not part of the requirements, I focused on ensuring that the core functionality works as expected.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Module Independence
+NestJS modules should be **independent** of each other. For communication between modules, I have used API calls and pub/sub.
 
-## Project setup
+## API Endpoints
 
-```bash
-$ npm install
+The following API endpoints are available in the application:
+
+### Product Endpoints
+- **GET /products**: Retrieve a list of all products.
+- **POST /products**: Create a new product.
+    - Request body:
+      ```json
+      {
+        "name": "Product Name",
+        "description": "Product Description",
+        "image": "Base64 Image String",
+        "price": 10.99,
+        "stock": 100
+      }
+      ```
+- **GET /products/:id**: Retrieve a single product by ID.
+- **PUT /products/:id**: Update an existing product by ID.
+    - Request body: Same format as the POST request.
+- **DELETE /products/:id**: Remove product by ID from the product list.
+- **PUT /products/:id/update-stock**: Update an existing product's stock.
+
+### Shopping Cart Endpoints
+- **POST /cart/:userId**: Create a new shopping cart for a user.
+- **GET /cart/:userId**: Retrieve a shopping cart by user ID.
+- **GET /cart/**: Retrieve all cart details.
+- **POST /cart/:id/add-product**: Add a product to the cart.
+    - Request body:
+      ```json
+      {
+        "productId": "12345",
+        "quantity": 2
+      }
+      ```
+- **PUT /cart/:id/update-quantity**: Update the quantity of a product in the cart.
+    - Request body:
+      ```json
+      {
+        "productId": "12345",
+        "quantity": 3
+      }
+      ```
+- **DELETE /cart/:id**: Delete the shopping cart.
+- **DELETE /cart/:cartId/remove-product/:productId**: Delete a product from the shopping cart.
+
+### Error Handling
+- All endpoints return appropriate status codes (e.g., 200 OK, 400 Bad Request, 404 Not Found).
+- Error messages are descriptive to help with troubleshooting.
+
+## Git Usage
+- Use **Git** for code management.
+- Follow the **Gitflow strategy** for branching and merging.
+- Use **conventional commit messages** to clearly track code changes.
+- Use **feature branches** to separate tasks.
+
+## Docker Setup
+The application is **dockerized** for easy setup and deployment. You can use the provided Dockerfile and `docker-compose.yaml` to spin up the application along with any required services.
+
+### Docker Setup Instructions
+
+To run the application with Docker, follow these steps:
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/kpalash37/NestJSAPI.git
+   cd NestJSAPI
+   ```
+
+2. **Build and start the containers using Docker Compose**:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+3. The application should now be running at:
+
+   ```
+   http://localhost:3000
+   ```
+
+4. Swagger Documentation:
+
+   Access the API documentation at:
+
+   ```
+   http://localhost:3000/api
+   ```
+
+5. MongoDB:
+
+   You can connect to the MongoDB instance at:
+
+   ```
+   http://localhost:27017
+   http://localhost:8081/
+   ```
+
+## Folder Structure
+
+The project is organized as follows:
+
+```
+NESTISAPI/
+├── dist/                # Compiled output (generated by TypeScript)
+├── node_modules/        # NPM dependencies
+├── src/                 # Source code
+│   ├── common/          # Shared utilities/helpers
+│   ├── modules/         # Feature modules
+│   │   ├── cart/        # Cart feature module
+│   │   │   ├── dtos/    # Data Transfer Objects for cart
+│   │   │   ├── cart.controller.ts       # REST API endpoints
+│   │   │   ├── cart.service.ts          # Business logic
+│   │   │   └── cart.module.ts           # Module configuration
+│   │   └── product/     # Product feature module
+│   │       ├── dto/     # Data Transfer Objects for product
+│   │       ├── product.controller.ts    # REST API endpoints
+│   │       ├── product.service.ts       # Business logic
+│   │       └── product.module.ts        # Module configuration
+│   ├── schemas/         # Database schemas/models (likely MongoDB/Mongoose)
+│   ├── app.controller.ts    # Root controller
+│   ├── app.module.ts        # Root module
+│   └── main.ts              # Application entry point
+├── test/               # Test files
+├── .env                # Environment variables
+├── docker-compose.yml  # Docker container orchestration
+├── Dockerfile          # Docker image configuration
+├── package.json        # Project dependencies
+└── tsconfig.json       # TypeScript configuration
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+## Thanks for your time!
+---
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).

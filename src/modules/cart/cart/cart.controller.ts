@@ -32,14 +32,14 @@ export class CartController {
   }
 
   @Get()
-  @ApiOperation({ summary: "Get all cart details" })
+  @ApiOperation({ summary: "Retrieve all cart details" })
   @ApiResponse({ status: 200, description: "Retrieve all carts details." })
   async getAllCarts() {
     return await this.cartService.getAllCartsAsync();
   }
 
   @Get("/:userId")
-  @ApiOperation({ summary: "Get cart details by userId" })
+  @ApiOperation({ summary: "Retrieve a shopping cart by user " })
   @ApiResponse({ status: 200, description: "Retrieve cart details." })
   async getByUserId(@Param("userId") userId: string) {
     return await this.cartService.getCartByUserIdAsync(userId);
